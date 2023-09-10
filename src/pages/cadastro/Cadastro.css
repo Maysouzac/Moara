@@ -1,0 +1,20 @@
+.fundoCadastro{
+  background-image: url(../../assets/florest.png);
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  display: block;
+  margin: 0 auto;
+}
+
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  width: 60%;
+  height: 80%;
+  margin: 0 auto;
+}

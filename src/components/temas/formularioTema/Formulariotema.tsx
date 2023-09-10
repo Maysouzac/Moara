@@ -1,0 +1,140 @@
+import { ChangeEvent, useContext, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { AuthContext } from '../../../contexts/AuthContext';
+import Tema from '../../../models/Tema';
+import { atualizar, buscar, cadastrar } from '../../../services/Service';
+import { toastAlerta } from '../../../util/toastAlerta';
+import '../../../pages/login/Login.css';
+
+function FormularioTema() {
+  const [tema, setTema] = useState<Tema>({} as Tema);
+
+  let navigate = useNavigate();
+
+  const { id } = useParams<{ id: string }>();
+
+  const { usuario, handleLogout } = useContext(AuthContext);
+  const token = usuario.token;
+
+  async function buscarPorId(id: string) {
+    await buscar(`/temas/${id}`, setTema, {
+      headers: {
+        Authorization: token,
+      },
+    });
+  }
+
+  useEffect(() => {
+    if (id !== undefined) {
+      buscarPorId(id)
+    }
+  }, [id])
+
+  function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
+    setTema({
+      ...tema,
+      [e.target.name]: e.target.value
+    })
+
+    console.log(JSON.stringify(tema))
+  }
+
+  async function gerarNovoTema(e: ChangeEvent<HTMLFormElement>) {
+    e.preventDefault()
+
+    if (id !== undefined) {
+      try {
+        await atualizar(`/temas`, tema, setTema, {
+          headers: {
+            'Authorization': token
+          }
+        })
+
+        toastAlerta('Tema atualizado com sucesso', 'sucesso')
+        retornar()
+
+      } catch (error: any) {
+        if (error.toString().includes('403')) {
+          toastAlerta('O token expirou, favor logar novamente', 'info')
+          handleLogout()
+        } else {
+          toastAlerta('Erro ao atualizar o Tema', 'erro')
+        }
+
+      }
+
+    } else {
+      try {
+        await cadastrar(`/temas`, tema, setTema, {
+          headers: {
+            'Authorization': token
+          }
+        })
+
+        toastAlerta('Tema cadastrado com sucesso', 'sucesso')
+
+      } catch (error: any) {
+        if (error.toString().includes('403')) {
+          toastAlerta('O token expirou, favor logar novamente', 'info')
+          handleLogout()
+        } else {
+          toastAlerta('Erro ao cadastrado o Tema', 'erro')
+        }
+      }
+    }
+
+    retornar()
+  }
+
+  function retornar() {
+    navigate("/temas")
+  }
+
+  useEffect(() => {
+    if (token === '') {
+      toastAlerta('Você precisa estar logado', 'info');
+      navigate('/login');
+    }
+  }, [token]);
+
+  return (
+    <div className='grid h-screen place-items-center w-1/1 fundoLogin'>
+      <div className="max-w-[500px] mx-auto flex-col gap-4 form-container h-[500px] bg-gradient-to-r from-[#02123E] via-[#06315E] to-[#02123E] rounded-lg drop-shadow-xl">
+        <h1 className="text-center my-8 text-[#FF7A00] text-5xl">
+          {id === undefined ? 'Cadastre um novo tema' : 'Editar tema'}
+        </h1>
+
+        <form className=" flex flex-col gap-4 w-[400px] " onSubmit={gerarNovoTema}>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="nome" className="text-white">Nome do tema</label>
+            <input
+              type="text"
+              placeholder="Nome"
+              name='nome'
+              className="border-2 border-slate-700 rounded p-2"
+              value={tema.nome}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
+            />
+            <label htmlFor="descricao" className="text-white">Descrição do tema</label>
+            <input
+              type="text"
+              placeholder="Descrição"
+              name='descricao'
+              className="border-2 border-slate-700 rounded p-2"
+              value={tema.descricao}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
+            />
+          </div>
+          <button
+            className="rounded text-slate-100 bg-gradient-to-r from-green-500 to-blue-600 hover:from-[#FF7A00] hover:to-[#ff1f1f]  w-1/2 py-2 mx-auto block"
+            type="submit"
+          >
+            {id === undefined ? 'Cadastrar' : 'Editar'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default FormularioTema;

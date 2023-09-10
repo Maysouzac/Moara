@@ -1,0 +1,41 @@
+.titulo {
+    color: blue;
+    text-align: center;
+}
+
+.img {
+    width: 500px;
+    height: 500px;
+    display: block;
+    margin: 0 auto;
+}
+
+.fundoSobre{
+    background-image: url(../../assets/folds_sparkles_blue.jpg);
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    display: block;
+    margin: 0 auto;
+
+}
+
+.texto-alinhado {
+    text-align: center; 
+    margin: 0 auto; 
+    max-width: 800px; 
+    padding: 20px; 
+    display: flex;
+  }
+
+  .centered-div {
+    margin: auto;
+    display: center;
+    justify-content: center;
+    align-items: center;
+    width: 500px;
+    height: 500px;
+    background-color: lightgray;
+  }
